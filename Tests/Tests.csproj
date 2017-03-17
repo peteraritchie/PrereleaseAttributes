@@ -63,8 +63,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.csproj">
-      <Project>{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}</Project>
+      <Project>{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}</Project>
       <Name>PRI.PrereleaseAttributes</Name>
     </ProjectReference>
   </ItemGroup>
