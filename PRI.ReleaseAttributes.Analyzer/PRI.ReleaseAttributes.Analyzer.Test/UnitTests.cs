@@ -45,7 +45,35 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 		[TestMethod]
 		public void PrereleasePropertyTypeInPrereleaseTypeDoesNotCauseDiagnostic()
 		{
-			Assert.Inconclusive("TODO");
+			#region test-code
+			var test = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using PRI.PrereleaseAttributes;
+
+	namespace ConsoleApplication1
+	{
+		[Prerelease]
+		public static class OtherType
+		{
+			[Prerelease]
+			public int Number {get;set;}
+		}
+	
+		class TypeName
+		{
+			public void Method()
+			{
+			}
+		}
+	}";
+			#endregion test-code
+
+			VerifyCSharpDiagnostic(test);
 		}
 
 		[TestMethod]
@@ -82,7 +110,37 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 		[TestMethod]
 		public void PrereleaseParameterTypeInPrereleaseTypeDoesNotCauseDiagnostic()
 		{
-			Assert.Inconclusive("TODO");
+			{
+				#region test-code
+				var test = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using PRI.PrereleaseAttributes;
+
+	namespace ConsoleApplication1
+	{
+		[Prerelease]
+		public static class OtherType
+		{
+			public int Number {get;set;}
+			public void DoSomething(OtherType o) {}
+		}
+	
+		class TypeName
+		{
+			public void Method()
+			{
+			}
+		}
+	}";
+				#endregion test-code
+
+				VerifyCSharpDiagnostic(test);
+			}
 		}
 
 		//No diagnostics expected to show up
@@ -403,7 +461,7 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 		}
 
 		[TestMethod]
-		public void TestDeclaredFieldPrereleaseTypeWithAssignmentFromProperty()
+		public void TestDeclaredFieldTypeWithAssignmentFromPropertyInPrereleaseType()
 		{
 			#region test-code
 			var test = @"
@@ -447,7 +505,51 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 		}
 
 		[TestMethod]
-		public void TestDeclaredFieldPrereleaseTypeWithAssignmentFromField()
+		public void TestDeclaredFieldTypeWithAssignmentFromPrereleaseProperty()
+		{
+			#region test-code
+			var test = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using PRI.PrereleaseAttributes;
+
+	namespace ConsoleApplication1
+	{
+		public class OtherType
+		{
+			[Prerelease]
+			static OtherType Instance { get { return new OtherType(); } }
+		}
+	
+		class TypeName
+		{
+			OtherType o = OtherType.Instance;
+			public void Method()
+			{
+			}
+		}
+	}";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name 'o' uses prerelease member 'ConsoleApplication1.OtherType.Instance'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 20, column: 14)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldTypeWithAssignmentFromPrereleaseField()
 		{
 			#region test-code
 			var test = @"

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -163,7 +164,7 @@ namespace PRI.ReleaseAttributes.Analyzer
 			var assemblyRule = UseOfPrereleaseAssemblyReturnTypeRule;
 
 			// check method return type
-			var methodDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel, (MethodDeclarationSyntax) analysisContext.Node);
+			var methodDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel, analysisContext.Node as MethodDeclarationSyntax);
 			if (TryReportPrereleaseAttributeDiagnostics(analysisContext, methodDeclaration, methodDeclaration.Identifier,
 				methodDeclaration.Type, typeRule, assemblyRule))
 			{
@@ -248,14 +249,10 @@ namespace PRI.ReleaseAttributes.Analyzer
 				return false;
 			}
 			var attributes = type.GetAttributes();
-			if (attributes == null)
-			{
-				return false;
-			}
 
 			string attributeName;
-			if (TryGetPrereleaseAttributeName(attributes, out attributeName))
-			{
+			if (attributes != null && attributes.Any()  &&TryGetPrereleaseAttributeName(attributes, out attributeName))
+			{ 
 				var diagnostic = Diagnostic.Create(typeRule,
 					identifier.GetLocation(),
 					identifier.ValueText, type.ToString(), attributeName, identifierContext);
@@ -264,7 +261,7 @@ namespace PRI.ReleaseAttributes.Analyzer
 				return true;
 			}
 
-			// check members
+			// check members// not sure this is needed.
 			var attributeNames = node.AttributeLists.AttributeFullNames(analysisContext);
 			if (attributeNames.Any())
 			{
