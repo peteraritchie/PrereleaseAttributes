@@ -13,7 +13,8 @@ namespace PRI.ReleaseAttributes.Analyzer
 		public static string[] AttributeFullNames(this SyntaxList<AttributeListSyntax> collection,
 			SyntaxNodeAnalysisContext analysisContext)
 		{
-			return collection.SelectMany(e => e.Attributes)
+			var attributeSyntaxes = collection.SelectMany(e => e.Attributes);
+			return attributeSyntaxes
 				.Select(e => analysisContext.SemanticModel.GetTypeInfo(e).Type.ToString())
 				.ToArray();
 		}

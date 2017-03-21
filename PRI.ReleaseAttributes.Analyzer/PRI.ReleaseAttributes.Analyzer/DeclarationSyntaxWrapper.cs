@@ -87,9 +87,19 @@ namespace PRI.ReleaseAttributes.Analyzer
 				{
 					Init(member);
 				}
+			var unit = syntaxNode as CompilationUnitSyntax;
+			if (unit != null)
+			{
+				Init(unit);
+			}
 #if LOCALS
 			}
 #endif // LOCALS
+		}
+
+		private void Init(CompilationUnitSyntax compilationUnitSyntax)
+		{
+			AttributeLists = compilationUnitSyntax.AttributeLists;
 		}
 
 
@@ -115,6 +125,15 @@ namespace PRI.ReleaseAttributes.Analyzer
 
 				return;
 			}
+			var indexerDeclaration = memberDeclarationSyntax as IndexerDeclarationSyntax;
+			if (indexerDeclaration != null)
+			{
+				AttributeLists = indexerDeclaration.AttributeLists;
+				Identifier = indexerDeclaration.ThisKeyword;
+				Type = _semanticModel.GetTypeInfo(indexerDeclaration.Type).Type;
+
+				return;
+			}
 			var methodDeclaration = memberDeclarationSyntax as MethodDeclarationSyntax;
 			if (methodDeclaration != null)
 			{
@@ -130,6 +149,25 @@ namespace PRI.ReleaseAttributes.Analyzer
 				AttributeLists = typeDeclaration.AttributeLists;
 				Identifier = typeDeclaration.Identifier;
 				Type = _semanticModel.GetTypeInfo(typeDeclaration).Type;
+
+				return;
+			}
+			var enumDeclaration = memberDeclarationSyntax as EnumMemberDeclarationSyntax;
+			if (enumDeclaration != null)
+			{
+				AttributeLists = enumDeclaration.AttributeLists;
+				Identifier = enumDeclaration.Identifier;
+				Type = _semanticModel.GetTypeInfo(enumDeclaration).Type;
+
+				return;
+			}
+
+			var namespaceDeclaration = memberDeclarationSyntax as NamespaceDeclarationSyntax;
+			if (namespaceDeclaration != null)
+			{
+				AttributeLists = new SyntaxList<AttributeListSyntax>();
+				Identifier = namespaceDeclaration.NamespaceKeyword;
+				Type = _semanticModel.GetTypeInfo(namespaceDeclaration).Type;
 
 				return;
 			}

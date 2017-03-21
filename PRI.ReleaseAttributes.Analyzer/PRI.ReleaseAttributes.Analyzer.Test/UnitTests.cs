@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -145,7 +146,7 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 
 		//No diagnostics expected to show up
 		[TestMethod]
-		public void TestMethod1()
+		public void NoDiagnosticWithNoCode()
 		{
 			var test = @"";
 
@@ -239,8 +240,7 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 		public void TestDeclaredVariableTypeInPrereleaseAssembly()
 		{
 			#region test-code
-			var test = @"
-	using System;
+			var source1 = @"using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
@@ -249,10 +249,21 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 	using PRI.PrereleaseAttributes;
 
 	[assembly: Prerelease]
+	namespace ClassLibrary
+	{
+		public static class OtherType { static OtherType CreateNew() {return new OtherType();}}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
 	namespace ConsoleApplication1
 	{
-		public static class OtherType { static int DidIt(){return true;}}
-	
 		class TypeName
 		{
 			public void Method()
@@ -265,15 +276,15 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 			var expected = new DiagnosticResult
 			{
 				Id = "EA0102",
-				Message = "Variable name 'otherType' instantiates type 'ConsoleApplication1.OtherType' in prerelease assembly",
+				Message = "Variable name 'otherType' instantiates type 'ClassLibrary.OtherType' in prerelease assembly",
 				Severity = DiagnosticSeverity.Warning,
 				Locations =
 					new[] {
-							new DiagnosticResultLocation("Test0.cs", line: 19, column: 15)
+							new DiagnosticResultLocation("Test1.cs", line: 16, column: 15)
 						}
 			};
 
-			VerifyCSharpDiagnostic(test, expected);
+			VerifyCSharpDiagnostic(expected, source1, source2);
 		}
 
 		[TestMethod]
@@ -475,15 +486,15 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 
 	namespace ConsoleApplication1
 	{
+		[Prerelease]
 		public class OtherType
 		{
-			[Prerelease]
 			static OtherType Instance { get { return new OtherType(); } }
 		}
 	
 		class TypeName
 		{
-			OtherType o = OtherType.Instance;
+			Object o = OtherType.Instance;
 			public void Method()
 			{
 			}
@@ -497,7 +508,7 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 				Severity = DiagnosticSeverity.Warning,
 				Locations =
 					new[] {
-							new DiagnosticResultLocation("Test0.cs", line: 20, column: 14)
+							new DiagnosticResultLocation("Test0.cs", line: 20, column: 11)
 						}
 			};
 
@@ -1093,6 +1104,511 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 			};
 
 			VerifyCSharpDiagnostic(expected, source1, source2);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromIndexerInPrereleaseType()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	[Prerelease]
+	public class TT
+	{
+		public int this[int index] { get { return index; } set { } }
+	}
+
+	public class TTT
+	{
+		[Prerelease]
+		private static readonly TT Tt = new TT();
+
+		private readonly int _number = Tt[0];
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				// TODO: this should be use member in prerelease type
+				Message = "Field name '_number' uses prerelease member 'TT.this[int]'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 14, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseEnum()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	[Prerelease]
+	public enum States
+	{
+		Past,
+		Present
+	}
+
+	public class TTT
+	{
+		private readonly int _number = (int)States.Past;
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_number' uses prerelease member 'States.Past'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 12, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromEnumInPrereleaseType()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	[Prerelease]
+	public static class Enums { public enum States
+	{
+		Past,
+		Present
+	}}
+
+	public class TTT
+	{
+		private readonly int _number = (int)Enums.States.Past;
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_number' uses prerelease member 'Enums.States.Past'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 12, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod, Ignore/* find out why this breaks the syntax tree*/]
+		public void TestDeclaredFieldInitializedFromEnumInPrereleaseAssembly()
+		{
+			#region test-code
+			var source1 = @"using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using PRI.PrereleaseAttributes;
+
+	[assembly: Prerelease]
+	namespace ClassLibrary
+	{
+		public static class OtherType { static OtherType CreateNew() {return new OtherType();}}
+		public static class Enums { public enum States
+		{
+			Past,
+			Present
+		}}
+}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TypeName
+		{
+			public void Method()
+			{
+				public readonly int Number = (int)Enums.States.Past;
+				// above line causes issues
+			}
+		}
+	}";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_number' uses prerelease member 'Enums.States.Past'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 12, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(expected, source1, source2);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseStruct()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	[Prerelease]
+	public static struct Value
+	{
+	}
+
+	public class TTT
+	{
+		private readonly object _value = new Value();
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0100",
+				Message = "Field name '_value' instantiates prerelease type 'Value'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 10, column: 27)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromStructInPrereleaseAssembly()
+		{
+			#region test-code
+			var source1 = @"using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using PRI.PrereleaseAttributes;
+
+	[assembly: Prerelease]
+	namespace ClassLibrary
+	{
+		public static struct Value
+		{
+		}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TypeName
+		{
+			public void Method()
+			{
+				private readonly object _value = new Value();
+			}
+		}
+	}";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0102",
+				Message = "Field name '_value' instantiates type 'ClassLibrary.Value' in prerelease assembly",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test1.cs", line: 16, column: 29)
+						}
+			};
+
+			VerifyCSharpDiagnostic(expected, source1, source2);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseOperator()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	public struct Value
+	{
+		private int _data;
+		public static readonly Value MinValue = new Value {_data = 1};
+		public static readonly Value MaxValue = new Value {_data = 100};
+
+		[Prerelease]
+		public static Value operator +(Value lhs, Value rhs)
+		{
+			var result = new Value {_value = lhs._value + rhs._value};
+			return result;
+		}
+	}
+
+	public class TTT
+	{
+		private readonly object _value = Value.MinValue + Value.MaxValue;
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromOperatorInPrereleaseType()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	[Prerelease]
+	public struct Value
+	{
+		private int _data;
+		public static readonly Value MinValue = new Value {_data = 1};
+		public static readonly Value MaxValue = new Value {_data = 100};
+
+		public static Value operator +(Value lhs, Value rhs)
+		{
+			var result = new Value {_data = lhs._data + rhs._data};
+			return result;
+		}
+	}
+
+	public class TTT
+	{
+		private readonly object _value = Value.MinValue + Value.MaxValue;
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromOperatorInPrereleaseAssembly()
+		{
+			#region test-code
+
+			var source1 = @"using PRI.PrereleaseAttributes;
+
+	[assembly: Prerelease]
+	namespace ClassLibrary
+	{
+		public struct Value
+		{
+			private int _data;
+			public static readonly Value MinValue = new Value {_data = 1};
+			public static readonly Value MaxValue = new Value {_data = 100};
+
+			public static Value operator +(Value lhs, Value rhs)
+			{
+				var result = new Value {_data = lhs._data + rhs._data};
+				return result;
+			}
+		}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TTT
+		{
+			private readonly object _value = Value.MinValue + Value.MaxValue;
+		}
+	}";
+
+			#endregion test-code
+
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				// TODO: should be 102
+				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[]
+					{
+						new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+					}
+			};
+
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromConversionOperatorInPrereleaseAssembly()
+		{
+			#region test-code
+
+			var source1 = @"using PRI.PrereleaseAttributes;
+
+	[assembly: Prerelease]
+	namespace ClassLibrary
+	{
+		public struct Value
+		{
+			private int _data;
+			public static readonly Value MinValue = new Value {_data = 1};
+			public static readonly Value MaxValue = new Value {_data = 100};
+
+			public static explicit operator Value(int value)
+			{
+				var result = new Value {_data = value};
+				return result;
+			}
+		}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TTT
+		{
+			private readonly object _value = (Value)42;
+		}
+	}";
+
+			#endregion test-code
+
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				// TODO: should be 102
+				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[]
+					{
+						new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+					}
+			};
+
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseEnumValue()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	public enum States
+	{
+		[Prerelease]
+		Past,
+		Present
+	}
+
+	public class TTT
+	{
+		private readonly int _number = (int)States.Past;
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_number' uses prerelease member 'States.Past'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 12, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseIndexer()
+		{
+			#region test-code
+			var test = @"using PRI.PrereleaseAttributes;
+
+	public class TT
+	{
+		[Prerelease]
+		public int this[int index] { get { return index; } set { } }
+	}
+
+	public class TTT
+	{
+		[Prerelease]
+		private static readonly TT Tt = new TT();
+
+		private readonly int _number = Tt[0];
+	}
+";
+			#endregion test-code
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_number' uses prerelease member 'TT.this[int]'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[] {
+							new DiagnosticResultLocation("Test0.cs", line: 14, column: 24)
+						}
+			};
+
+			VerifyCSharpDiagnostic(test, expected);
 		}
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()

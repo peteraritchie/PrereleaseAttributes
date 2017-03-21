@@ -124,30 +124,56 @@ namespace PRI.ReleaseAttributes.Analyzer
 				{
 					return;
 				}
-				var objectCreationSyntax = variable.Initializer.Value as ObjectCreationExpressionSyntax;
-				
-				// check the initializer from object creation:
-				if (objectCreationSyntax?.Type != null)
+				var expression = variable.Initializer?.Value;
+				if (expression != null)
 				{
-					var ti = analysisContext.SemanticModel.GetTypeInfo(variable.Initializer.Value);
-					if (TryReportPrereleaseAttributeDiagnostics(analysisContext, fieldDeclaration, identifier, ti.Type, typeRule, assemblyRule, identifierContext))
+					var castExpressionSyntax = expression as CastExpressionSyntax;
+					if (castExpressionSyntax != null)
 					{
-						return;
+						expression = castExpressionSyntax.Expression;
+					}
+
+					var objectCreationSyntax = (expression as ObjectCreationExpressionSyntax);
+
+					var binaryExpression = expression as BinaryExpressionSyntax;
+					if (binaryExpression != null)
+					{
+						var expressionSymbol = analysisContext.SemanticModel.GetSymbolInfo(binaryExpression).Symbol;
+						TryReportPrereleaseAttributeDiagnostics(analysisContext, expressionSymbol, identifier, "Field");
+					}
+					// check the initializer from object creation:
+					if (objectCreationSyntax?.Type != null)
+					{
+						var ti = analysisContext.SemanticModel.GetTypeInfo(expression);
+						if (TryReportPrereleaseAttributeDiagnostics(analysisContext, fieldDeclaration, identifier, ti.Type, typeRule,
+							assemblyRule, identifierContext))
+						{
+							return;
+						}
+					}
+
+					// check the initialize from member access
+					var memberAccessSyntax = expression as MemberAccessExpressionSyntax;
+					if (memberAccessSyntax != null)
+					{
+						var symbolInfo = analysisContext.SemanticModel.GetSymbolInfo(memberAccessSyntax);
+						var symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
+						if (symbol != null)
+						{
+							TryReportPrereleaseAttributeDiagnostics(analysisContext, symbol, identifier, identifierContext);
+						}
+					}
+					var elementAccessSyntax = expression as ElementAccessExpressionSyntax;
+					if (elementAccessSyntax != null)
+					{
+						var symbolInfo = analysisContext.SemanticModel.GetSymbolInfo(elementAccessSyntax);
+						var symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
+						if (symbol != null)
+						{
+							TryReportPrereleaseAttributeDiagnostics(analysisContext, symbol, identifier, identifierContext);
+						}
 					}
 				}
-
-				// check the initialize from member access
-				var memberAccessSyntax = variable.Initializer.Value as MemberAccessExpressionSyntax;
-				if(memberAccessSyntax != null)
-				{
-					var symbolInfo = analysisContext.SemanticModel.GetSymbolInfo(memberAccessSyntax);
-					var symbol = symbolInfo.Symbol ?? symbolInfo.CandidateSymbols.FirstOrDefault();
-					if(symbol != null)
-					{
-						TryReportPrereleaseAttributeDiagnostics(analysisContext, symbol, identifier, identifierContext);
-					}
-				}
-
 				// check the initializer from object creation:
 				//if (memberAccessSyntax?.Type != null)
 				//{
@@ -219,19 +245,38 @@ namespace PRI.ReleaseAttributes.Analyzer
 		/// usage
 		private void TryReportPrereleaseAttributeDiagnostics(SyntaxNodeAnalysisContext analysisContext, ISymbol symbol, SyntaxToken identifier, string identifierContext)
 		{
-			var attributes = symbol.GetAttributes();
-			string attributeName;
-			if (TryGetPrereleaseAttributeName(attributes, out attributeName))
+			Diagnostic diagnostic;
+			string attributeName = null;
+			var symbolHierarchy = new[] {symbol, symbol.ContainingSymbol, symbol.ContainingType.ContainingType, symbol.ContainingAssembly};
+			foreach (var symbolObject in symbolHierarchy)
 			{
-				var diagnostic = Diagnostic.Create(UseOfPrereleaseMemberRule,
-					identifier.GetLocation(),
-					identifier.ValueText, symbol.ToString(), attributeName, identifierContext);
+				if (symbolObject == null)
+				{
+					continue;
+				}
+				var attributes = symbolObject.GetAttributes();
+				if (TryGetPrereleaseAttributeName(attributes, out attributeName))
+				{
+					diagnostic = Diagnostic.Create(UseOfPrereleaseMemberRule,
+						identifier.GetLocation(),
+						identifier.ValueText, symbol.ToString(), attributeName, identifierContext);
 
-				analysisContext.ReportDiagnostic(diagnostic);
+					analysisContext.ReportDiagnostic(diagnostic);
+					return;
+				}
+			}
+			var syntaxReference = symbol.DeclaringSyntaxReferences.FirstOrDefault();
+			var memberDeclarationSyntax = syntaxReference?.GetSyntax() as MemberDeclarationSyntax;
+			if (memberDeclarationSyntax == null || !IsNodeInPrereleaseContext(analysisContext,
+				    new DeclarationSyntaxWrapper(analysisContext.SemanticModel, memberDeclarationSyntax)))
+			{
 				return;
 			}
-			// TODO: check if used item is in prerelease context instead.
-			return;
+			diagnostic = Diagnostic.Create(UseOfPrereleaseMemberRule,
+				identifier.GetLocation(),
+				identifier.ValueText, symbol.ToString(), attributeName, identifierContext);
+
+			analysisContext.ReportDiagnostic(diagnostic);
 		}
 
 		/// declaration
@@ -314,35 +359,32 @@ namespace PRI.ReleaseAttributes.Analyzer
 
 		private bool IsNodeInPrereleaseContext(SyntaxNodeAnalysisContext analysisContext, DeclarationSyntaxWrapper node)
 		{
-			// first check this node
-			bool parentsChecked = false;
-
 			while (true)
 			{
 				var attributeNames = node.AttributeLists.AttributeFullNames(analysisContext);
-				if ((CSharpSyntaxNode)node is BaseTypeDeclarationSyntax && !attributeNames.Any())
-				{
-					var compilationUnit = node.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault();
-					if (compilationUnit != null) // ever?
-					{
-						attributeNames = compilationUnit.AttributeLists.AttributeFullNames(analysisContext);
-					}
-				}
+				// TODO: shouldn't need this
+				//if ((CSharpSyntaxNode)node is BaseTypeDeclarationSyntax && !attributeNames.Any())
+				//{
+				//	var compilationUnit = node.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault();
+				//	if (compilationUnit != null) // ever?
+				//	{
+				//		attributeNames = compilationUnit.AttributeLists.AttributeFullNames(analysisContext);
+				//	}
+				//}
 				string attributeName;
 				if (attributeNames.Any() &&
-				    TryGetPrereleaseAttributeName(attributeNames, out attributeName))
+					TryGetPrereleaseAttributeName(attributeNames, out attributeName))
 				{
 					return true;
 				}
 
-				if (parentsChecked)
+				if ((CSharpSyntaxNode)node is CompilationUnitSyntax)
 				{
 					return false;
 				}
 
 				// then check parent node
 				node = node.Parent;
-				parentsChecked = true;
 			}
 		}
 
