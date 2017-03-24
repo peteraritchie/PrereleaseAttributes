@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -130,7 +129,15 @@ namespace PRI.ReleaseAttributes.Analyzer
 					var castExpressionSyntax = expression as CastExpressionSyntax;
 					if (castExpressionSyntax != null)
 					{
-						expression = castExpressionSyntax.Expression;
+						expression = castExpressionSyntax.Expression; // for when we fall through
+						var ti = analysisContext.SemanticModel.GetTypeInfo(castExpressionSyntax.Type);
+						if (TryReportPrereleaseAttributeDiagnostics(analysisContext, fieldDeclaration, identifier, ti.Type, typeRule,
+							assemblyRule, identifierContext))
+						{
+							return;
+						}
+						var symbol = analysisContext.SemanticModel.GetSymbolInfo(castExpressionSyntax).Symbol;
+						TryReportPrereleaseAttributeDiagnostics(analysisContext, symbol, identifier, "Field");
 					}
 
 					var objectCreationSyntax = (expression as ObjectCreationExpressionSyntax);
@@ -174,13 +181,6 @@ namespace PRI.ReleaseAttributes.Analyzer
 						}
 					}
 				}
-				// check the initializer from object creation:
-				//if (memberAccessSyntax?.Type != null)
-				//{
-				//	ti = analysisContext.SemanticModel.GetTypeInfo(variable.Initializer.Value);
-				//	if (TryReportPrereleaseAttributeDiagnostics(analysisContext, fieldDeclaration, identifier, ti, typeRule, assemblyRule, "Field"))
-				//		return;
-				//}
 			}
 		}
 
@@ -196,9 +196,6 @@ namespace PRI.ReleaseAttributes.Analyzer
 			{
 				return;
 			}
-
-			//if (TryReportPrereleaseAttributeDiagnostic(analysisContext, methodReturnTypeInfo, methodIdentifier, typeRule, assemblyRule))
-			//	return;
 
 			typeRule = UseOfPrereleaseTypeRule;
 			assemblyRule = UseOfPrereleaseAssemblyRule;
@@ -308,17 +305,14 @@ namespace PRI.ReleaseAttributes.Analyzer
 
 			// check members// not sure this is needed.
 			var attributeNames = node.AttributeLists.AttributeFullNames(analysisContext);
-			if (attributeNames.Any())
+			if (attributeNames.Any() && TryGetPrereleaseAttributeName(attributeNames, out attributeName))
 			{
-				if (TryGetPrereleaseAttributeName(attributeNames, out attributeName))
-				{
-					var diagnostic = Diagnostic.Create(assemblyRule,
-						identifier.GetLocation(),
-						identifier.ValueText, type.ToString(), attributeName, identifierContext);
+				var diagnostic = Diagnostic.Create(assemblyRule,
+					identifier.GetLocation(),
+					identifier.ValueText, type.ToString(), attributeName, identifierContext);
 
-					analysisContext.ReportDiagnostic(diagnostic);
-					return true;
-				}
+				analysisContext.ReportDiagnostic(diagnostic);
+				return true;
 			}
 			attributes = type.ContainingAssembly.GetAttributes();
 			if (TryGetPrereleaseAttributeName(attributes, out attributeName))
@@ -331,30 +325,6 @@ namespace PRI.ReleaseAttributes.Analyzer
 				return true;
 			}
 			return false;
-			//var attributeNames = node.AttributeLists.SelectMany(e => e.Attributes)
-			//		.Select(e => analysisContext.SemanticModel.GetTypeInfo(e).Type.ToString());
-			//string attributeName;
-			//if (TryGetPrereleaseAttributeName(attributeNames, out attributeName))
-			//{
-			//	var diagnostic = Diagnostic.Create(typeRule,
-			//		node.GetLocation(),//identifier.GetLocation(),
-			//		node.GetText().ToString(), node.ToFullString(),//identifier.ValueText, type.ToString(),
-			//		attributeName, identifierContext);
-
-			//	analysisContext.ReportDiagnostic(diagnostic);
-			//	return true;
-			//}
-			////var @namespace = node.Parent as NamespaceDeclarationSyntax;
-			////if (TryGetPrereleaseAttributeName(attributes, out attributeName))
-			////{
-			////	var diagnostic = Diagnostic.Create(assemblyRule,
-			////		identifier.GetLocation(),
-			////		identifier.ValueText, type.ToString(), attributeName, identifierContext);
-
-			////	analysisContext.ReportDiagnostic(diagnostic);
-			////	return true;
-			////}
-			//return false;
 		}
 
 		private bool IsNodeInPrereleaseContext(SyntaxNodeAnalysisContext analysisContext, DeclarationSyntaxWrapper node)
@@ -362,15 +332,6 @@ namespace PRI.ReleaseAttributes.Analyzer
 			while (true)
 			{
 				var attributeNames = node.AttributeLists.AttributeFullNames(analysisContext);
-				// TODO: shouldn't need this
-				//if ((CSharpSyntaxNode)node is BaseTypeDeclarationSyntax && !attributeNames.Any())
-				//{
-				//	var compilationUnit = node.Ancestors().OfType<CompilationUnitSyntax>().FirstOrDefault();
-				//	if (compilationUnit != null) // ever?
-				//	{
-				//		attributeNames = compilationUnit.AttributeLists.AttributeFullNames(analysisContext);
-				//	}
-				//}
 				string attributeName;
 				if (attributeNames.Any() &&
 					TryGetPrereleaseAttributeName(attributeNames, out attributeName))
@@ -387,45 +348,6 @@ namespace PRI.ReleaseAttributes.Analyzer
 				node = node.Parent;
 			}
 		}
-
-		//private bool TryReportPrereleaseAttributeDiagnostic(SyntaxNodeAnalysisContext analysisContext, TypeInfo ti, SyntaxToken identifier, DiagnosticDescriptor typeRule, DiagnosticDescriptor assemblyRule, string identifierContext = "Variable")
-		//{
-		//	if (!IsNodeInPrereleaseContext(analysisContext, node))
-		//		return false;
-		//	if (ti.Type == null)
-		//		return false;
-		//	var attributes = ti.Type.GetAttributes();
-		//	if (attributes == null)
-		//		return false;
-		//	string attributeName;
-		//	var parent = identifier.Parent as MemberDeclarationSyntax;
-		//	if (parent != null)
-		//	{
-		//		var t = analysisContext.SemanticModel.GetTypeInfo(parent);
-		//		ClassDeclarationSyntax @class = parent.Parent as ClassDeclarationSyntax;
-		//		t = analysisContext.SemanticModel.GetTypeInfo(@class);
-		//	}
-		//	if (TryGetPrereleaseAttributeName(attributes, out attributeName))
-		//	{
-		//		var diagnostic = Diagnostic.Create(typeRule,
-		//			identifier.GetLocation(),
-		//			identifier.ValueText, ti.Type.ToString(), attributeName, identifierContext);
-
-		//		analysisContext.ReportDiagnostic(diagnostic);
-		//		return true;
-		//	}
-		//	attributes = ti.Type.ContainingAssembly.GetAttributes();
-		//	if (TryGetPrereleaseAttributeName(attributes, out attributeName))
-		//	{
-		//		var diagnostic = Diagnostic.Create(assemblyRule,
-		//			identifier.GetLocation(),
-		//			identifier.ValueText, ti.Type.ToString(), attributeName, identifierContext);
-
-		//		analysisContext.ReportDiagnostic(diagnostic);
-		//		return true;
-		//	}
-		//	return false;
-		//}
 
 		private bool TryGetPrereleaseAttributeName(IEnumerable<string> attributeNames, out string attributeName)
 		{

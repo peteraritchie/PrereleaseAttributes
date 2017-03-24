@@ -9,8 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace PRI.ReleaseAttributes.Analyzer {
-    using System;
-    using System.Reflection;
+	using System.Reflection;
     
     
     /// <summary>

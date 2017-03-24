@@ -1475,15 +1475,16 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 			{
 				Id = "EA0101",
 				// TODO: should be 102
-				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Message = "Field name '_value' uses prerelease member 'ClassLibrary.Value.operator +(ClassLibrary.Value, ClassLibrary.Value)'",
 				Severity = DiagnosticSeverity.Warning,
 				Locations =
 					new[]
 					{
-						new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+						new DiagnosticResultLocation("Test1.cs", line: 14, column: 28)
 					}
 			};
 
+			VerifyCSharpDiagnostic(expected, source1, source2);
 		}
 
 		[TestMethod]
@@ -1530,17 +1531,131 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 
 			var expected = new DiagnosticResult
 			{
-				Id = "EA0101",
-				// TODO: should be 102
-				Message = "Field name '_value' uses prerelease member 'Value.operator +(Value, Value)'",
+				Id = "EA0102",
+				Message = "Field name '_value' instantiates type 'ClassLibrary.Value' in prerelease assembly",
 				Severity = DiagnosticSeverity.Warning,
 				Locations =
 					new[]
 					{
-						new DiagnosticResultLocation("Test0.cs", line: 19, column: 27)
+						new DiagnosticResultLocation("Test1.cs", line: 14, column: 28)
 					}
 			};
 
+			VerifyCSharpDiagnostic(expected, source1, source2);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromConversionOperatorInPrereleaseType()
+		{
+			#region test-code
+
+			var source1 = @"using PRI.PrereleaseAttributes;
+
+	namespace ClassLibrary
+	{
+		[Prerelease]
+		public struct Value
+		{
+			private int _data;
+			public static readonly Value MinValue = new Value {_data = 1};
+			public static readonly Value MaxValue = new Value {_data = 100};
+
+			public static explicit operator Value(int value)
+			{
+				var result = new Value {_data = value};
+				return result;
+			}
+		}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TTT
+		{
+			private readonly object _value = (Value)42;
+		}
+	}";
+
+			#endregion test-code
+
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0100",
+				Message = "Field name '_value' instantiates prerelease type 'ClassLibrary.Value'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[]
+					{
+						new DiagnosticResultLocation("Test1.cs", line: 14, column: 28)
+					}
+			};
+
+			VerifyCSharpDiagnostic(expected, source1, source2);
+		}
+
+		[TestMethod]
+		public void TestDeclaredFieldInitializedFromPrereleaseConversionOperator()
+		{
+			#region test-code
+
+			var source1 = @"using PRI.PrereleaseAttributes;
+
+	namespace ClassLibrary
+	{
+		public struct Value
+		{
+			private int _data;
+			public static readonly Value MinValue = new Value {_data = 1};
+			public static readonly Value MaxValue = new Value {_data = 100};
+
+			[Prerelease]
+			public static explicit operator Value(int value)
+			{
+				var result = new Value {_data = value};
+				return result;
+			}
+		}
+	}";
+			var source2 = @"
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Diagnostics;
+	using ClassLibrary;
+
+	namespace ConsoleApplication1
+	{
+		public class TTT
+		{
+			private readonly object _value = (Value)42;
+		}
+	}";
+
+			#endregion test-code
+
+			var expected = new DiagnosticResult
+			{
+				Id = "EA0101",
+				Message = "Field name '_value' uses prerelease member 'ClassLibrary.Value.explicit operator ClassLibrary.Value(int)'",
+				Severity = DiagnosticSeverity.Warning,
+				Locations =
+					new[]
+					{
+						new DiagnosticResultLocation("Test1.cs", line: 14, column: 28)
+					}
+			};
+
+			VerifyCSharpDiagnostic(expected, source1, source2);
 		}
 
 		[TestMethod]
