@@ -140,6 +140,9 @@
     </Exec>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>Echo DONE with Analyzer build.</PostBuildEvent>
+    <PostBuildEvent>Echo DONE with $(ProjectName) build.</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>Echo START with $(ProjectName) build</PreBuildEvent>
   </PropertyGroup>
 </Project>

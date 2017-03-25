@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		<Identity Id="PRI.ReleaseAttributes.Analyzer.Quicken Loans.7e5ff872-8261-4822-bf8d-202fe684379a" Version="1.0" Language="en-US" Publisher="Peter Ritchie"/>
-		<DisplayName>PRI.ReleaseAttributes.Analyzer</DisplayName>
+		<Identity Id="PRI.PrereleaseAttributes.Analyzer.Quicken Loans.7e5ff872-8261-4822-bf8d-202fe684379a" Version="1.0" Language="en-US" Publisher="Peter Ritchie"/>
+		<DisplayName>PRI.PrereleaseAttributes.Analyzer</DisplayName>
 		<Description xml:space="preserve">This is a sample diagnostic extension for the .NET Compiler Platform ("Roslyn").</Description>
 	</Metadata>
 	<Installation>
@@ -12,8 +12,8 @@
 		<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
 	</Dependencies>
 	<Assets>
-		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="PRI.ReleaseAttributes.Analyzer" Path="|PRI.ReleaseAttributes.Analyzer|"/>
-		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="PRI.ReleaseAttributes.Analyzer" Path="|PRI.ReleaseAttributes.Analyzer|"/>
+		<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="PRI.PrereleaseAttributes.Analyzer" Path="|PRI.PrereleaseAttributes.Analyzer|"/>
+		<Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="PRI.PrereleaseAttributes.Analyzer" Path="|PRI.PrereleaseAttributes.Analyzer|"/>
 	</Assets>
 	<Prerequisites>
 		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
