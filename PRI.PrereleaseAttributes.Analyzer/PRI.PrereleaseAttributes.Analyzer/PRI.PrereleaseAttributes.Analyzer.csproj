@@ -37,7 +37,7 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DeclarationSyntaxWrapper.cs" />
+    <Compile Include="DeclarationSyntaxFacade.cs" />
     <Compile Include="DiagnosticAnalyzer.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

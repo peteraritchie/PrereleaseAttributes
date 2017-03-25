@@ -22,7 +22,7 @@ namespace PRI.PrereleaseAttributes.Analyzer.Test
 			SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
 			var compilation = CSharpCompilation.Create("test", new[] { tree });
 			var node = tree.GetRoot().ChildNodes().Single().ChildNodes().First();
-			var sut = new DeclarationSyntaxWrapper(compilation.GetSemanticModel(tree), node as MemberDeclarationSyntax);
+			var sut = new DeclarationSyntaxFacade(compilation.GetSemanticModel(tree), node as MemberDeclarationSyntax);
 		}
 	}
 }

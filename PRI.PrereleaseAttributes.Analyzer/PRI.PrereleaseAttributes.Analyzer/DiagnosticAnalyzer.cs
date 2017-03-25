@@ -87,7 +87,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 
 		private void AnalyzePropertyDeclaration(SyntaxNodeAnalysisContext analysisContext)
 		{
-			var propertyDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel,
+			var propertyDeclaration = new DeclarationSyntaxFacade(analysisContext.SemanticModel,
 				(PropertyDeclarationSyntax) analysisContext.Node);
 
 			const string identifierContext = "Property";
@@ -102,7 +102,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 
 		private void AnalyzeFieldDeclaration(SyntaxNodeAnalysisContext analysisContext)
 		{
-			var fieldDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel,
+			var fieldDeclaration = new DeclarationSyntaxFacade(analysisContext.SemanticModel,
 				(FieldDeclarationSyntax) analysisContext.Node);
 
 			const string identifierContext = "Field";
@@ -191,7 +191,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 			var assemblyRule = UseOfPrereleaseAssemblyReturnTypeRule;
 
 			// check method return type
-			var methodDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel, analysisContext.Node as MethodDeclarationSyntax);
+			var methodDeclaration = new DeclarationSyntaxFacade(analysisContext.SemanticModel, analysisContext.Node as MethodDeclarationSyntax);
 			if (TryReportPrereleaseAttributeDiagnostics(analysisContext, methodDeclaration, methodDeclaration.Identifier,
 				methodDeclaration.Type, typeRule, assemblyRule))
 			{
@@ -212,7 +212,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 					{
 						continue;
 					}
-					var localDeclaration = new DeclarationSyntaxWrapper(analysisContext.SemanticModel, localDeclarationStatementSyntax);
+					var localDeclaration = new DeclarationSyntaxFacade(analysisContext.SemanticModel, localDeclarationStatementSyntax);
 
 					if (TryReportPrereleaseAttributeDiagnostics(analysisContext, localDeclaration,
 						localDeclaration.Identifier, localDeclaration.Type, typeRule, assemblyRule))
@@ -266,7 +266,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 			var syntaxReference = symbol.DeclaringSyntaxReferences.FirstOrDefault();
 			var memberDeclarationSyntax = syntaxReference?.GetSyntax() as MemberDeclarationSyntax;
 			if (memberDeclarationSyntax == null || !IsNodeInPrereleaseContext(analysisContext,
-				    new DeclarationSyntaxWrapper(analysisContext.SemanticModel, memberDeclarationSyntax)))
+				    new DeclarationSyntaxFacade(analysisContext.SemanticModel, memberDeclarationSyntax)))
 			{
 				return;
 			}
@@ -279,7 +279,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 
 		/// declaration
 		private bool TryReportPrereleaseAttributeDiagnostics(SyntaxNodeAnalysisContext analysisContext,
-			DeclarationSyntaxWrapper node, SyntaxToken identifier, 
+			DeclarationSyntaxFacade node, SyntaxToken identifier, 
 			ITypeSymbol type, DiagnosticDescriptor typeRule,
 			DiagnosticDescriptor assemblyRule, string identifierContext = "Variable")
 		{
@@ -328,7 +328,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 			return false;
 		}
 
-		private bool IsNodeInPrereleaseContext(SyntaxNodeAnalysisContext analysisContext, DeclarationSyntaxWrapper node)
+		private bool IsNodeInPrereleaseContext(SyntaxNodeAnalysisContext analysisContext, DeclarationSyntaxFacade node)
 		{
 			while (true)
 			{

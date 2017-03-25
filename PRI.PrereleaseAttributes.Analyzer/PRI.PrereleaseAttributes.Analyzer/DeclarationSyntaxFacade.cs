@@ -20,23 +20,23 @@ namespace PRI.PrereleaseAttributes.Analyzer
 	/// <seealso cref="Parent"/>, and <seealso cref="Ancestors"/>.
 	/// Seems like there would be a type in the hierarchy for this, but no.
 	/// </summary>
-	internal class DeclarationSyntaxWrapper
+	[ExcludeFromCodeCoverage]
+	internal class DeclarationSyntaxFacade
 	{
 		private readonly SemanticModel _semanticModel;
 		private readonly SyntaxNode _syntaxNode;
 
-		public static implicit operator SyntaxNode(DeclarationSyntaxWrapper wrapper)
+		public static implicit operator SyntaxNode(DeclarationSyntaxFacade facade)
 		{
-			return wrapper._syntaxNode;
+			return facade._syntaxNode;
 		}
 
-		[ExcludeFromCodeCoverage]
 		public override string ToString()
 		{
 			return _syntaxNode.ToString();
 		}
 
-		public DeclarationSyntaxWrapper(SemanticModel semanticModel, [NotNull]MemberDeclarationSyntax memberDeclarationSyntax)
+		public DeclarationSyntaxFacade(SemanticModel semanticModel, [NotNull]MemberDeclarationSyntax memberDeclarationSyntax)
 		{
 #if false
 			if (memberDeclarationSyntax == null)
@@ -49,7 +49,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 
 			Init(memberDeclarationSyntax);
 		}
-		public DeclarationSyntaxWrapper(SemanticModel semanticModel, LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
+		public DeclarationSyntaxFacade(SemanticModel semanticModel, LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
 		{
 #if false // only null on compilation unit node?  We don't support that
 			if (localDeclarationStatementSyntax == null)
@@ -62,7 +62,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 			Init(localDeclarationStatementSyntax);
 		}
 
-		private DeclarationSyntaxWrapper(SemanticModel semanticModel, SyntaxNode syntaxNode)
+		private DeclarationSyntaxFacade(SemanticModel semanticModel, SyntaxNode syntaxNode)
 		{
 #if false // only null on compilation unit node?  We don't support that
 			if (syntaxNode == null)
@@ -211,7 +211,7 @@ namespace PRI.PrereleaseAttributes.Analyzer
 			return _syntaxNode.DescendantNodes();
 		}
 		public SyntaxList<AttributeListSyntax> AttributeLists { get; private set; }
-		public DeclarationSyntaxWrapper Parent => new DeclarationSyntaxWrapper(_semanticModel, _syntaxNode.Parent);
+		public DeclarationSyntaxFacade Parent => new DeclarationSyntaxFacade(_semanticModel, _syntaxNode.Parent);
 
 		public IEnumerable<SyntaxNode> Ancestors()
 		{

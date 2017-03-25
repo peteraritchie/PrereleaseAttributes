@@ -1,6 +1,7 @@
 # PrereleaseAttributes
 [![Build status](https://ci.appveyor.com/api/projects/status/v4u3jxlpops4q9ca/branch/master?svg=true)](https://ci.appveyor.com/project/peteraritchie/prereleaseattributes/branch/master)
 [![NuGet](https://img.shields.io/nuget/v/PRI.PrereleaseAttributes.svg)](https://www.nuget.org/packages/PRI.PrereleaseAttributes/)
+[![Coverage Status](https://coveralls.io/repos/github/peteraritchie/PrereleaseAttributes/badge.svg)](https://coveralls.io/github/peteraritchie/PrereleaseAttributes)
 
 Proposed prerelease attributes to signify members/types that are prerelease.
 
