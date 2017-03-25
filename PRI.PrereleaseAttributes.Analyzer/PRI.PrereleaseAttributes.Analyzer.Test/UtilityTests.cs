@@ -17,11 +17,7 @@ namespace PRI.PrereleaseAttributes.Analyzer.Test
 		{
 			var source = @"public class Test
 		{
-			public object this[int index]
-			{
-				get { return null; }
-				set { }
-			}
+			x=1;
 		}";
 			SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
 			var compilation = CSharpCompilation.Create("test", new[] { tree });
