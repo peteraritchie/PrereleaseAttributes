@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+		<id>PRI.PrereleaseAttributes</id>
+		<version>$version$</version>
+		<title>Prerelease attributes</title>
+		<authors>Peter Ritchie</authors>
+		<owners>Peter Ritchie</owners>
+		<licenseUrl>https://raw.githubusercontent.com/peteraritchie/PrereleaseAttributes/master/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/peteraritchie/PrereleaseAttributes</projectUrl>
+		<iconUrl>https://github.com/peteraritchie/PrereleaseAttributes/raw/dev/caution.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Proposed prerelease attributes to signify members/types that are prerelease</description>
+    <releaseNotes>Addition of an analyzer</releaseNotes>
+    <copyright>Copyright 2017 Peter Ritchie</copyright>
+    <tags>Prerelease Attributes Experimental Preview</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System" targetFramework="" />
+    </frameworkAssemblies>
+    <developmentDependency>true</developmentDependency>
+  </metadata>
+  <!-- The convention for analyzers is to put language agnostic dlls in analyzers\portable50 and language specific analyzers in either analyzers\portable50\cs or analyzers\portable50\vb -->
+  <files>
+    <file src="*.dll" target="analyzers\dotnet\cs" exclude="**\Microsoft.CodeAnalysis.*;**\System.Collections.Immutable.*;**\System.Reflection.Metadata.*;**\System.Composition.*" />
+    <file src="tools\*.ps1" target="tools\" />
+    <file src="PRI.PrereleaseAttributes.dll" target="lib\portable-net45+win8" />
+  </files>
+</package>

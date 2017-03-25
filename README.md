@@ -1,4 +1,8 @@
 # PrereleaseAttributes
+[![Build status](https://ci.appveyor.com/api/projects/status/v4u3jxlpops4q9ca/branch/master?svg=true)](https://ci.appveyor.com/project/peteraritchie/prereleaseattributes/branch/master)
+[![NuGet](https://img.shields.io/nuget/v/PRI.PrereleaseAttributes.svg)](https://www.nuget.org/packages/PRI.PrereleaseAttributes/)
+[![Coverage Status](https://coveralls.io/repos/github/peteraritchie/PrereleaseAttributes/badge.svg)](https://coveralls.io/github/peteraritchie/PrereleaseAttributes)
+
 Proposed prerelease attributes to signify members/types that are prerelease.
 
 PrereleaseAttributes has 4 attriutes: `PrereleaseAttribute`, `ExperimentalAttribute`, `AlphaAttribute`, and `PreviewAttribute`.  The idea is that someone writing code or providing a library to someone else could add one of these attributes to signify the code is one or more of instable, unsupported, or untested.

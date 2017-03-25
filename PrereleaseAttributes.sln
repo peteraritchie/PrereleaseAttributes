@@ -3,20 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes", "PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.csproj", "{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{677619AA-B7EF-47CC-9A88-577FC824E774}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
 		caution.png = caution.png
+		CodeCoverage.runsettings = CodeCoverage.runsettings
 		LICENSE = LICENSE
-		PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.nuspec = PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.nuspec
+		PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.nuspec = PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.nuspec
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.csproj", "{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer.Test", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.Test\PRI.PrereleaseAttributes.Analyzer.Test.csproj", "{B212EF7C-51C5-43F5-91B8-23BAB8269781}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer.Vsix", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.Vsix\PRI.PrereleaseAttributes.Analyzer.Vsix.csproj", "{75D81DDD-E780-47EA-A14B-219774B53217}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes", "PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.csproj", "{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +32,25 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAAAE913-30A6-476F-A94A-F79D7B8AB7CF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B212EF7C-51C5-43F5-91B8-23BAB8269781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B212EF7C-51C5-43F5-91B8-23BAB8269781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B212EF7C-51C5-43F5-91B8-23BAB8269781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B212EF7C-51C5-43F5-91B8-23BAB8269781}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75D81DDD-E780-47EA-A14B-219774B53217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75D81DDD-E780-47EA-A14B-219774B53217}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75D81DDD-E780-47EA-A14B-219774B53217}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
