@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PRI.ReleaseAttributes.Analyzer {
+namespace PRI.PrereleaseAttributes.Analyzer {
 	using System.Reflection;
     
     
@@ -39,7 +39,7 @@ namespace PRI.ReleaseAttributes.Analyzer {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PRI.ReleaseAttributes.Analyzer.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PRI.PrereleaseAttributes.Analyzer.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

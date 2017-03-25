@@ -6,8 +6,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestHelper;
+using PRI.PrereleaseAttributes.Analyzer;
 
-namespace PRI.ReleaseAttributes.Analyzer.Test
+namespace PRI.PrereleaseAttributes.Analyzer.Test
 {
 	[TestClass]
 	public class UnitTest : CodeFixVerifier
@@ -1728,7 +1729,7 @@ namespace PRI.ReleaseAttributes.Analyzer.Test
 
 		protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
 		{
-			return new PRIReleaseAttributesAnalyzerAnalyzer();
+			return new PRIPrereleaseAttributesAnalyzerAnalyzer();
 		}
 	}
 }

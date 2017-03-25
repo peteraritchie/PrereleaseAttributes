@@ -15,8 +15,8 @@
     <ProjectGuid>{75D81DDD-E780-47EA-A14B-219774B53217}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PRI.ReleaseAttributes.Analyzer.Vsix</RootNamespace>
-    <AssemblyName>PRI.ReleaseAttributes.Analyzer.Vsix</AssemblyName>
+    <RootNamespace>PRI.PrereleaseAttributes.Analyzer.Vsix</RootNamespace>
+    <AssemblyName>PRI.PrereleaseAttributes.Analyzer.Vsix</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
@@ -54,9 +54,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer.csproj">
+    <ProjectReference Include="..\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.csproj">
       <Project>{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}</Project>
-      <Name>PRI.ReleaseAttributes.Analyzer</Name>
+      <Name>PRI.PrereleaseAttributes.Analyzer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

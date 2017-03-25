@@ -10,8 +10,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ExcludeFromCodeCoverage=System.Diagnostics.DebuggerNonUserCodeAttribute;
 #endif
 
-[assembly:InternalsVisibleTo("PRI.ReleaseAttributes.Analyzer.Test")]
-namespace PRI.ReleaseAttributes.Analyzer
+[assembly:InternalsVisibleTo("PRI.PrereleaseAttributes.Analyzer.Test")]
+namespace PRI.PrereleaseAttributes.Analyzer
 {
 	/// <summary>
 	/// A class that wraps a SyntaxNode in order to provide a consistent API to get at

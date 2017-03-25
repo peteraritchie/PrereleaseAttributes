@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PRI.ReleaseAttributes.Analyzer.Test
+namespace PRI.PrereleaseAttributes.Analyzer.Test
 {
 	[TestClass]
 	public class UtilityTests

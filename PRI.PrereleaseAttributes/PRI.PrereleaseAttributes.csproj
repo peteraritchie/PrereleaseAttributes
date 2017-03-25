@@ -34,19 +34,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="AlphaAttribute.cs" />
     <Compile Include="ExperimentalAttribute.cs" />
     <Compile Include="PrereleaseAttribute.cs" />
     <Compile Include="PreviewAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\PRI.ReleaseAttributes.Analyzer.1.0.6280.1675\analyzers\dotnet\cs\PRI.PrereleaseAttributes.dll" />
-    <Analyzer Include="..\packages\PRI.ReleaseAttributes.Analyzer.1.0.6280.1675\analyzers\dotnet\cs\PRI.ReleaseAttributes.Analyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

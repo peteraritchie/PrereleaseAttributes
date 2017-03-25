@@ -9,19 +9,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		caution.png = caution.png
-		PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer\Diagnostic.nuspec = PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer\Diagnostic.nuspec
 		LICENSE = LICENSE
-		PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.nuspec = PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.nuspec
+		PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.nuspec = PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.nuspec
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{7DCAAAAD-9AC6-422A-961F-808C5FB3128C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.ReleaseAttributes.Analyzer", "PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer.csproj", "{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.csproj", "{22677DC0-4EC3-41DF-A8F0-BE8C654595E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.ReleaseAttributes.Analyzer.Test", "PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer.Test\PRI.ReleaseAttributes.Analyzer.Test.csproj", "{B212EF7C-51C5-43F5-91B8-23BAB8269781}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer.Test", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.Test\PRI.PrereleaseAttributes.Analyzer.Test.csproj", "{B212EF7C-51C5-43F5-91B8-23BAB8269781}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.ReleaseAttributes.Analyzer.Vsix", "PRI.ReleaseAttributes.Analyzer\PRI.ReleaseAttributes.Analyzer.Vsix\PRI.ReleaseAttributes.Analyzer.Vsix.csproj", "{75D81DDD-E780-47EA-A14B-219774B53217}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes.Analyzer.Vsix", "PRI.PrereleaseAttributes.Analyzer\PRI.PrereleaseAttributes.Analyzer.Vsix\PRI.PrereleaseAttributes.Analyzer.Vsix.csproj", "{75D81DDD-E780-47EA-A14B-219774B53217}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRI.PrereleaseAttributes", "PRI.PrereleaseAttributes\PRI.PrereleaseAttributes.csproj", "{7CC3E538-C095-4EA0-AFA7-B4D4A1C1BAB3}"
 EndProject

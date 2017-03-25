@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace PRI.ReleaseAttributes.Analyzer
+namespace PRI.PrereleaseAttributes.Analyzer
 {
 	public static class ExtensionMethods
 	{
