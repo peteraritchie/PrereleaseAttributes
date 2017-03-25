@@ -131,6 +131,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>DONE with Test build.</PostBuildEvent>
+    <PostBuildEvent>Echo DONE with Test build.</PostBuildEvent>
   </PropertyGroup>
 </Project>

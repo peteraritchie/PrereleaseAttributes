@@ -140,6 +140,6 @@
     </Exec>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>DONE with Analyzer build.</PostBuildEvent>
+    <PostBuildEvent>Echo DONE with Analyzer build.</PostBuildEvent>
   </PropertyGroup>
 </Project>
